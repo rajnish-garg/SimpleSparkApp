@@ -14,7 +14,7 @@ Input:
 
 #Step to run
 spark-submit --class  my.simple.app.CountNullForEachColumn \
---master local[*[  \
+--master local[*]  \
 --conf spark.serializer=org.apache.spark.serializer.JavaSerializer \
 --verbose \
 <JAR_PATH>/<JAR_NAME> <INPUT_FILE>  

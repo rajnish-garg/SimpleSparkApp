@@ -34,11 +34,17 @@ object CountNullForEachColumn extends  Logging {
 
       //Count null for each column
       val partStats = rdd.mapPartitions( (iter: Iterator[Array[String]]) => {
-        val nullStat: Array[Counter] = iter.next().map( d => Counter(d))
-        iter.foreach( arr => {
-          nullStat.zip(arr).foreach { case (n, d) => n.add(d)}
-        })
-        Iterator(nullStat)
+        try {
+          val nullStat: Array[Counter] = iter.next().map(d => Counter(d))
+          iter.foreach(arr => {
+            nullStat.zip(arr).foreach { case (n, d) => n.add(d) }
+          })
+          Iterator(nullStat)
+        }
+        catch {
+          case e: Exception => Iterator()
+        }
+
 
       })
 
@@ -66,7 +72,7 @@ object CountNullForEachColumn extends  Logging {
 
     // Check for null, if not null, return 0, else 1
     def nullOrNot(x: String): Counter = {
-      if (x.equals("")) {
+      if (x.equals("null") || x.equals("")) {
         this.nullCount = 1
       }
       this
@@ -85,11 +91,8 @@ object CountNullForEachColumn extends  Logging {
 
   }
 
-  object Counter extends Serializable {
+object Counter extends Serializable {
 
-    def apply(x: String): Counter = new Counter().nullOrNot(x)
+  def apply(x: String): Counter = new Counter().nullOrNot(x)
 
-  }
-
-
-
+}
